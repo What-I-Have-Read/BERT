@@ -1,3 +1,3 @@
 # Bert
 
-bert implementation with huggingface-transformers
+bert tasks implementation with [huggingface-transformers](https://github.com/huggingface/transformers)
