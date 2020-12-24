@@ -59,14 +59,22 @@ class DataLoader():
             yield {"input_ids": input_ids, "attention_mask": attention_mask,
                    "token_type_ids": token_type_ids}, label
 
+    @property
+    def dummy_inputs(self):
+        """
+        取训练所用dataset第一个元素的x值作为dummy_inputs来初始化模型结构，需要train与predict使用seq_length相同
+        """
+        return list(self.dataset.take(1))[0][0]
+
     def _gen_dataset(self):
         dataset = tf.data.Dataset.from_generator(self._data_generator,
                                                  output_types=({"input_ids": tf.int32, "attention_mask": tf.int32,
                                                                 "token_type_ids": tf.int32}, tf.int32))
-        dataset = dataset.batch(
-            batch_size=self.batch_size, drop_remainder=False)
         return dataset
 
     def __iter__(self):
-        for x, y in self.dataset:
+        dataset = self.dataset.batch(
+            batch_size=self.batch_size, drop_remainder=False)
+        dataset = dataset.prefetch(1)
+        for x, y in dataset:
             yield x, y

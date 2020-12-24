@@ -31,6 +31,28 @@ class BertClassifier(tf.keras.Model):
 
     @property
     def dummy_inputs(self):
+        # todo
+        # tf.keras.model.save_model之后再load
+        # 在预测与构造模型结构使用seq_length不同的seq_length的tokens时候会出现error:
+        ''' 
+            (.eg: model(dummy_inputs, training=False) 构建模型, 这里dummy_inputs seq_length=6, 
+             预测时候则需要输入tokens的seq_length=32)
+            (解决方案：1. 改用save_weights, 2. 直接使用32长度的dummy_inputs；
+             针对方案2，我们使用dataloader中的dummy_inputs)
+        >>>
+            Could not find matching function to call loaded from the SavedModel. Got:
+            Positional arguments (2 total):
+                * {'input_ids': <tf.Tensor 'inputs:0' shape=(1, 32) dtype=int32>}
+                * False
+            Keyword arguments: {}
+
+            Expected these arguments to match one of the following 4 option(s):
+
+            Option 1:
+            Positional arguments (2 total):
+                * {'input_ids': TensorSpec(shape=(None, 6),...
+        >>>
+        '''
         return {"input_ids": tf.constant([[7, 6, 0, 0, 1], [1, 2, 3, 0, 0], [0, 0, 0, 4, 5]])}
 
     @tf.function()
